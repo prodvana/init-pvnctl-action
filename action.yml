@@ -1,0 +1,75 @@
+name: "Init pvnctl"
+description: "Initialize the pvnctl cli tool"
+inputs:
+  version:
+    description: "pvnctl version to install, installs the latest version by default"
+    required: true
+    default: "latest"
+  org:
+    description: "Prodvana organization to deploy to (you can find this in your Org's url: <org>.prodvana.io)"
+    required: true
+  api_token:
+    description: "api token to use"
+    required: true
+  api_port:
+    description: "api port to use"
+    default: "443"
+outputs: {}
+runs:
+  using: "composite"
+  steps:
+    - name: install pvnctl
+      shell: bash
+      run: |
+        set -euxo pipefail
+        PARAM_VERSION="${{ inputs.version }}"
+
+        RELEASE="latest"
+        if [[ ${PARAM_VERSION} == "latest" ]]; then
+                VERSION=$(curl --header "authorization: Bearer ${{ github.token }}" -s "https://api.github.com/repos/prodvana/pvnctl/releases/${RELEASE}" | jq -r ".tag_name")
+        else
+                VERSION=${PARAM_VERSION}
+        fi
+
+        case $(uname) in
+        Linux) PLATFORM="linux" ;;
+        Darwin) PLATFORM="darwin" ;;
+        *)
+                echo "unsupported platform"
+                exit 1
+                ;;
+        esac
+
+        case $(uname -m) in
+        x86_64) ARCH="amd64" ;;
+        i386) ARCH="386" ;;
+        arm64) ARCH="arm64" ;;
+        aarch64) ARCH="arm64" ;;
+        *)
+                echo "unsupported architecture"
+                exit 1
+                ;;
+        esac
+
+        ARCHIVE_NAME="pvnctl_${VERSION}_${PLATFORM}_${ARCH}.tar.gz"
+
+        curl -Ls -o checksums.txt "https://github.com/prodvana/pvnctl/releases/download/${VERSION}/checksums.txt"
+        curl -Ls -o "${ARCHIVE_NAME}" "https://github.com/prodvana/pvnctl/releases/download/${VERSION}/${ARCHIVE_NAME}"
+
+        # validate checksum
+        grep "${ARCHIVE_NAME}" checksums.txt | sha256sum --check
+
+        tar xf "${ARCHIVE_NAME}"
+        rm "${ARCHIVE_NAME}" checksums.txt
+
+        [[ -w /usr/local/bin ]] && SUDO="" || SUDO=sudo
+
+        ${SUDO} chmod +x ./pvnctl
+        ${SUDO} mv ./pvnctl /usr/local/bin/pvnctl
+    - name: auth pvnctl
+      shell: bash
+      run: |
+        set -euxo pipefail
+
+        pvnctl auth context add default "api.${{ inputs.org }}.prodvana.io:${{ inputs.api_port }}"
+        pvnctl auth token "${{ inputs.api_token }}"
