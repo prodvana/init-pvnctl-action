@@ -16,7 +16,7 @@ This action helps intstall Prodvana's [pvnctl](https://github.com/prodvana/pvnct
 
 ```yaml
 steps:
-  - uses: prodvana/init-pvnctl@v0.1.0 
+  - uses: prodvana/init-pvnctl-action@v0.1.0 
     with:
       org: my-org # you can find this in your Prodvana URL: <org>.provana.io 
       api_token: ${{ secrets.YOUR_PRODVANA_API_TOKEN }} # create with `pvnctl api-tokens create`
