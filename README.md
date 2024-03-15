@@ -9,14 +9,14 @@ This action helps intstall Prodvana's [pvnctl](https://github.com/prodvana/pvnct
 | Input      | Default    | Description                                                           |
 | ---------- | ---------- | --------------------------------------------------------------------- |
 | version    | latest     | Version of the `pvnctl` binary to install                             |
-| org        | (required) | Your Provdana Org Slug, found in your URL: `<org>.prodvana.io         |
+| org        | (required) | Your Provdana Org Slug, found in your URL: `<org>.runprodvana.com     |
 | api_token  | (required) | Prodvana API Token. You can create one with `pvnctl api-token create` |
 
 ## Basic Usage
 
 ```yaml
 steps:
-  - uses: prodvana/init-pvnctl-action@v0.1.0 
+  - uses: prodvana/init-pvnctl-action@v0.1.1
     with:
       org: my-org # you can find this in your Prodvana URL: <org>.provana.io 
       api_token: ${{ secrets.YOUR_PRODVANA_API_TOKEN }} # create with `pvnctl api-tokens create`
