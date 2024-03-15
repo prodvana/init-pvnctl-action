@@ -71,5 +71,5 @@ runs:
       run: |
         set -euxo pipefail
 
-        pvnctl auth context add default "api.${{ inputs.org }}.prodvana.io:${{ inputs.api_port }}"
+        pvnctl auth context add default "${{ inputs.org }}.grpc.runprodvana.com:${{ inputs.api_port }}"
         pvnctl auth token "${{ inputs.api_token }}"
