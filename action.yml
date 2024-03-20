@@ -6,7 +6,7 @@ inputs:
     required: true
     default: "latest"
   org:
-    description: "Prodvana organization to deploy to (you can find this in your Org's url: <org>.prodvana.io)"
+    description: "Prodvana organization to deploy to (you can find this in your Org's url: <org>.runprodvana.com)"
     required: true
   api_token:
     description: "api token to use"
@@ -14,6 +14,9 @@ inputs:
   api_port:
     description: "api port to use"
     default: "443"
+  base_domain:
+    description: Internal use only -- don't change this unless you know what you're doing.
+    default: runprodvana.com
 outputs: {}
 runs:
   using: "composite"
@@ -71,5 +74,5 @@ runs:
       run: |
         set -euxo pipefail
 
-        pvnctl auth context add default "${{ inputs.org }}.grpc.runprodvana.com:${{ inputs.api_port }}"
+        pvnctl auth context add default "${{ inputs.org }}.grpc.${{ inputs.base_domain }}:${{ inputs.api_port }}"
         pvnctl auth token "${{ inputs.api_token }}"
